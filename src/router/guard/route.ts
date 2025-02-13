@@ -35,7 +35,7 @@ export function createRouteGuard(router: Router) {
     const routeRoles = to.meta.roles || [];
 
     const hasRole = authStore.userInfo.roles.some(role => routeRoles.includes(role));
-    const hasAuth = authStore.isStaticSuper || !routeRoles.length || hasRole;
+    const hasAuth = !routeRoles.length || hasRole;
 
     // if it is login route when logged in, then switch to the root page
     if (to.name === loginRoute && isLogin) {
@@ -75,23 +75,6 @@ async function initRoute(to: RouteLocationNormalized): Promise<RouteLocationRaw 
   const routeStore = useRouteStore();
   const notFoundRoute: RouteKey = 'not-found';
   const isNotFoundRoute = to.name === notFoundRoute;
-
-  // if the constant route is not initialized, then initialize the constant route
-  if (!routeStore.isInitConstantRoute) {
-    routeStore.initConstantRoute();
-
-    // the route is captured by the "not-found" route because the constant route is not initialized
-    // after the constant route is initialized, redirect to the original route
-    const path = to.fullPath;
-    const location: RouteLocationRaw = {
-      path,
-      replace: true,
-      query: to.query,
-      hash: to.hash
-    };
-
-    return location;
-  }
 
   const isLogin = Boolean(getToken());
 
